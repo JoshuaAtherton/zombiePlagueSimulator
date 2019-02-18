@@ -15,10 +15,22 @@
     <script type="text/javascript" src="logic.js"></script>
     <script type="text/javascript" src="main.js"></script>
     <button id="restartSimulation" value="Refresh Page" onClick="location.href=location.href"> Restart Simulation </button>
-    <p>
-      Description: Simulation starts with one infected zombie that infects other people and turns them
-      into zombies when touched.
-    </p>
+    <section>
+      <h3>Description: </h3>
+        <ul>
+          <li>Black circles are healthy survivors</li>
+          <li>Red circles are infected zombies</li>
+          <li>Survivors have to gather food to remain alive. If they fail to gather food
+          their health is decrease. If their health is less than or equal to zero they
+          become a zombie.</li>
+          <li>Zombies will chase survivors to infect them. But there are also resistance
+          pockets that have come up with a cure. Because of this their is a small
+          chance that a zombie can become a survivor again, with the condition that
+          they now only have 50 percent health.</li>
+          <li>Simulation starts with one infected zombie that infects other people and turns them
+          into zombies when touched.</li>
+        </ul>
+    </section>
   </div>
 </body>
 

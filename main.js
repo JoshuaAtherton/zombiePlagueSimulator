@@ -1,24 +1,20 @@
+//Joshua Atherton
+
 /*
 Ideas:
-  - make zombies slower after being infected
+  - zombies slower after being infected
   - make everyone slower so simulation lasts longer
-  - chance for zombie to sponteneously become healthy again
-  - animation on background
-  - animation for healthy and zombie person
-  - options in game (would have to do reload button better for html)
-    -can select amount of zombies on start
-    -click to spawn a new infected zombie
-    -and right click to spawn new healthy person
-  - fix wall bug????
+  - chance for zombie to sponteneously become healthy again (start with 50% health)
+  - non infected zombies have random chance to gather food, if fail to gather food
+    health is subtracted, if health <= 0 become a zombie
 */
 
 var ASSET_MANAGER = new AssetManager();
 
-ASSET_MANAGER.queueDownload("./img/black.png");
-ASSET_MANAGER.queueDownload("./img/white.png");
+ASSET_MANAGER.queueDownload("zomb_back.jpg");
 
 ASSET_MANAGER.downloadAll(function() {
-  console.log("starting up da sheild");
+
   const canvas = document.getElementById('gameWorld');
   canvas.width = 600;
   canvas.height = 600;
@@ -26,7 +22,7 @@ ASSET_MANAGER.downloadAll(function() {
 
   const gameEngine = new GameEngine(ctx);
   var singleZombie = new Zombie(gameEngine, canvas.width);
-  singleZombie.infect();
+  singleZombie.setInfected();
   gameEngine.addEntity(singleZombie);
   for (let i = 0; i < 16; i++) {
     singleZombie = new Zombie(gameEngine, canvas.width);

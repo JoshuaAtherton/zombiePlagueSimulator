@@ -6,7 +6,7 @@ canvas {
   width: auto;
 }
 
-h1, p, button {
+h1, h3, p, button {
   font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
   text-align: center;
 }
@@ -19,4 +19,12 @@ button {
   padding: 10px;
   display: block;
   width: auto;
+}
+
+section {
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+  display: block;
+  width: 600px;
+  height: 160px;
+  margin: 0 auto;
 }
