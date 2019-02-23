@@ -23,18 +23,23 @@ ASSET_MANAGER.downloadAll(function() {
 
   const gameEngine = new GameEngine(ctx);
 
-  //add the infected zombie
-  var singleZombie = new Zombie(gameEngine, canvas.width);
-  singleZombie.setInfected();
-  gameEngine.addEntity(singleZombie);
+  //add infected zombies
+  var singleZombie;
+  for (let i = 0; i < 3; i++) {
+    singleZombie = new Zombie(gameEngine, canvas.width);
+    singleZombie.setInfected();
+    gameEngine.addEntity(singleZombie);
+  }
 
   //add the resistanceFighter
-  singleZombie = new Zombie(gameEngine, canvas.width);
-  singleZombie.setResistanceFighter();
-  gameEngine.addEntity(singleZombie);
+  for (let i = 0; i < 1; i++) {
+    singleZombie = new Zombie(gameEngine, canvas.width);
+    singleZombie.setResistanceFighter();
+    gameEngine.addEntity(singleZombie);
+  }
 
   //add the survivors
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 20; i++) {
     singleZombie = new Zombie(gameEngine, canvas.width);
     gameEngine.addEntity(singleZombie);
   }

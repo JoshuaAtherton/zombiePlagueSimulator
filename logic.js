@@ -50,30 +50,26 @@ class Zombie extends Entity {
     this.color = 0;
     this.visualRadius = 500;
 
-	  // this.friction += 10
     this.maxSpeed -= 10;
+    this.resistanceFighter = false;
   }
   setResistanceFighter() {
     this.resistanceFighter = true;
     this.color = 2;
-    this.visualRadius = 50;
+    this.visualRadius = 60;
   }
   setHealthy() {
     this.infected = false;
     this.color = 3;
     this.visualRadius = 50;
-	  this.health = 500;
-    this.maxSpeed = MAX_SPEED;
+	  this.health = 50;
+    this.maxSpeed = MAX_SPEED * .5;
 
   }
   setLegless() {
     this.maxSpeed = 0;
     this.legless = true;
     this.color = 1;
-    this.velocity = {
-      x: 0,
-      y: 0
-    };
     // console.log("Zombie's legs fell off");
   }
   //return boolean
@@ -116,14 +112,13 @@ class Zombie extends Entity {
 
     //
     if(this.resistanceFighter) {
-      // if (this.velocity.x === 0 || this.velocity.y ===0) {
-      //   this.velocity = {
-      //     x: Math.random() * 1000,
-      //     y: Math.random() * 1000
-      //   };
-      //   this.x += Math.random() * 1000;
-      //   this.y += Math.random() * 100;
-      // }
+      //if he is doing a bad job killing zombies his health goes down
+      if (this.game.survivorCount < (this.game.survivorCount + this.game.infectedCount) / 2) {
+        this.health -= 10;
+        if (this.health < 0) {
+          this.setInfected();
+        }
+      }
     }
 
     //survivors have to gather food
@@ -131,7 +126,7 @@ class Zombie extends Entity {
 			//attempt to find food, if food not found then take health away
 			let min = 0; let max = 10000;
 			if (Math.floor(Math.random() * (max - min)) + min >= 9990) {
-				this.health --;
+				this.health--;
 			} else {
 				this.health++;
 			}
@@ -206,8 +201,6 @@ class Zombie extends Entity {
         } else if (ent.infected) {
           if (this.resistanceFighter) {
             ent.removeFromWorld = true;
-            this.velocity.x += 200;
-            this.velocity.y += 300;
           } else {
             this.setInfected();
           }
