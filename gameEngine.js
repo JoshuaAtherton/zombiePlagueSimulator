@@ -75,8 +75,11 @@ class GameEngine {
     draw() {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.ctx.save();
+        var entitiesCount = this.entities.length;
         for (var i = 0; i < this.entities.length; i++) {
-            this.entities[i].draw(this.ctx);
+            if(!this.entities[i].removeFromWorld) {
+              this.entities[i].draw(this.ctx);
+            }
         }
         this.ctx.restore();
     }

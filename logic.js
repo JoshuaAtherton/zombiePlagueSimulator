@@ -16,17 +16,24 @@ class Zombie extends Entity {
       CIRCLE_RADIUS + Math.random() * (canvasWidthHeight - CIRCLE_RADIUS * 2));
     this.canvasWidthHeight = canvasWidthHeight;
 
-    this.health = 1000;
+    this.zombieDurability = 1000;
+
+    this.resistanceFighter = false;
+    this.health = 100;
     this.circleRadius = CIRCLE_RADIUS;
     this.friction = FRICTION;
     this.acceleration = ACCELERATION;
     this.maxSpeed = MAX_SPEED;
 
+    this.infected = false;
+    this.color = 3;
+    this.legless = false;
+
     this.player = 1;
     this.radius = this.circleRadius;
     this.visualRadius = 100;
     this.colors = ["Red", "Green", "Blue", "black"];
-    this.setHealthy();
+
     this.velocity = {
       x: Math.random() * 1000,
       y: Math.random() * 1000
@@ -43,19 +50,41 @@ class Zombie extends Entity {
     this.color = 0;
     this.visualRadius = 500;
 
-    // this.acceleration += 200;
-	// this.friction -= 10
-    // this.maxSpeed -= 5;
+	  // this.friction += 10
+    this.maxSpeed -= 10;
+  }
+  setResistanceFighter() {
+    this.resistanceFighter = true;
+    this.color = 2;
+    this.visualRadius = 50;
   }
   setHealthy() {
     this.infected = false;
     this.color = 3;
-    this.visualRadius = 100;
-	this.health = 500;
+    this.visualRadius = 50;
+	  this.health = 500;
+    this.maxSpeed = MAX_SPEED;
 
   }
+  setLegless() {
+    this.maxSpeed = 0;
+    this.legless = true;
+    this.color = 1;
+    this.velocity = {
+      x: 0,
+      y: 0
+    };
+    // console.log("Zombie's legs fell off");
+  }
+  //return boolean
+  //is distance between field of view < the radiuses combined?
   collide(other) {
     return distance(this, other) < this.radius + other.radius;
+  }
+  isInView (other) {
+    // console.log(distance(this, other));
+    // console.log(this.x, this.y, other.x, other.y);
+    return distance(this, other) <= this.visualRadius;
   }
   collideLeft() {
     return (this.x - this.radius) < 0;
@@ -71,19 +100,38 @@ class Zombie extends Entity {
   }
 
   update() {
-
+    //check zombies durability and chance to be cured
 		if (this.infected) {
+      this.zombieDurability--;
 			let min = 0; let max = 10000;
-			if (Math.floor(Math.random() * (max - min)) + min >= 9993) {
+      //chance to be cured only if zombieDurability not worn out
+			if (Math.floor(Math.random() * (max - min)) + min >= 9999 && this.zombieDurability > 0) {
 				this.setHealthy();
 			}
+      if (this.zombieDurability <= 0) {
+        this.setLegless();
+        // this.removeFromWorld = true;
+      }
 		}
 
+    //
+    if(this.resistanceFighter) {
+      // if (this.velocity.x === 0 || this.velocity.y ===0) {
+      //   this.velocity = {
+      //     x: Math.random() * 1000,
+      //     y: Math.random() * 1000
+      //   };
+      //   this.x += Math.random() * 1000;
+      //   this.y += Math.random() * 100;
+      // }
+    }
+
+    //survivors have to gather food
 		if (!this.infected) {
 			//attempt to find food, if food not found then take health away
 			let min = 0; let max = 10000;
-			if (Math.floor(Math.random() * (max - min)) + min >= 9900) {
-				this.health -= 250;
+			if (Math.floor(Math.random() * (max - min)) + min >= 9990) {
+				this.health --;
 			} else {
 				this.health++;
 			}
@@ -94,17 +142,12 @@ class Zombie extends Entity {
 
 		if (this.game.click) {
 				console.log('click');
-				let zom = new Zombie(this, this.canvasWidthHeight);
-				zom.x = this.game.click.x;
-				zom.y = this.game.click.y;
-				// this.game.addEntity(zom);
 		}
 		if (this.game.rightclick) {
 				console.log('right click');
-
 		}
 
-
+    //check collisions with borders
     this.x += this.velocity.x * this.game.clockTick;
     this.y += this.velocity.y * this.game.clockTick;
     if (this.collideLeft() || this.collideRight()) {
@@ -125,8 +168,12 @@ class Zombie extends Entity {
       this.x += this.velocity.x * this.game.clockTick;
       this.y += this.velocity.y * this.game.clockTick;
     }
+
+
     for (var i = 0; i < this.game.entities.length; i++) {
       var ent = this.game.entities[i];
+
+      //check for collisions between entities
       if (ent !== this && this.collide(ent)) {
         var temp = {
           x: this.velocity.x,
@@ -148,31 +195,58 @@ class Zombie extends Entity {
         this.y += this.velocity.y * this.game.clockTick;
         ent.x += ent.velocity.x * this.game.clockTick;
         ent.y += ent.velocity.y * this.game.clockTick;
+        //if collied with an infected entity set infected
         if (this.infected) {
-          ent.setInfected();
+          if (ent.resistanceFighter) { // hit resistance fighter killed zombie
+            this.removeFromWorld = true;
+          } else {
+            this.zombieDurability += 5;
+            ent.setInfected();
+          }
         } else if (ent.infected) {
-          this.setInfected();
+          if (this.resistanceFighter) {
+            ent.removeFromWorld = true;
+            this.velocity.x += 200;
+            this.velocity.y += 300;
+          } else {
+            this.setInfected();
+          }
         }
       }
+
+      //chasing behavior of zombies
       if (ent != this && this.collide({
           x: ent.x,
           y: ent.y,
-          radius: this.visualRadius
-        })) {
+          radius: this.visualRadius })
+      ) {
         var dist = distance(this, ent);
-        if (this.infected && dist > this.radius + ent.radius + 10) {
+        if (this.infected || this.resistanceFighter && dist > this.radius + ent.radius + 10) {
           var difX = (ent.x - this.x) / dist;
           var difY = (ent.y - this.y) / dist;
-          this.velocity.x += difX * this.acceleration / (dist * dist);
-          this.velocity.y += difY * this.acceleration / (dist * dist);
-          var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
-          if (speed > this.maxSpeed) {
-            var ratio = this.maxSpeed / speed;
-            this.velocity.x *= ratio;
-            this.velocity.y *= ratio;
+          if (!this.resistanceFighter) { //resistance figters dont chase survivors
+            this.velocity.x += difX * this.acceleration / (dist * dist);
+            this.velocity.y += difY * this.acceleration / (dist * dist);
+            var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
+            if (speed > this.maxSpeed) {
+              var ratio = this.maxSpeed / speed;
+              this.velocity.x *= ratio;
+              this.velocity.y *= ratio;
+            }
+          // resistance fighters chase zombies
+          } else if (this.resistanceFighter && ent.infected) {
+            this.velocity.x += difX * this.acceleration / (dist * dist);
+            this.velocity.y += difY * this.acceleration / (dist * dist);
+            var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
+            if (speed > this.maxSpeed) {
+              var ratio = this.maxSpeed / speed;
+              this.velocity.x *= ratio;
+              this.velocity.y *= ratio;
+            }
           }
         }
-        if (ent.infected && dist > this.radius + ent.radius) {
+        //resistance fighters don't run
+        if (ent.infected && !this.resistanceFighter && dist > this.radius + ent.radius) {
           var difX = (ent.x - this.x) / dist;
           var difY = (ent.y - this.y) / dist;
           this.velocity.x -= difX * this.acceleration / (dist * dist);
@@ -185,6 +259,16 @@ class Zombie extends Entity {
           }
         }
       }
+
+      //chasing behavior of resistance fighters: no running – only attack
+      if (ent !== this && this.resistanceFighter) {
+        if (this.isInView(this, ent)) {
+          // console.log(this.collide({ x: ent.x, y: ent.y, radius: this.visualRadius }));
+          // console.log('spotted?');
+        }
+
+      }
+
     }
     this.velocity.x -= (1 - this.friction) * this.game.clockTick * this.velocity.x;
     this.velocity.y -= (1 - this.friction) * this.game.clockTick * this.velocity.y;
