@@ -50,7 +50,7 @@ class Zombie extends Entity {
     this.color = 0;
     this.visualRadius = 500;
 
-    this.maxSpeed -= 10;
+    this.maxSpeed -= 6;
     this.resistanceFighter = false;
   }
   setResistanceFighter() {
@@ -107,7 +107,9 @@ class Zombie extends Entity {
 			let min = 0; let max = 10000;
       //chance to be cured only if zombieDurability not worn out and
 			if (Math.floor(Math.random() * (max - min)) + min >= 9999 && this.zombieDurability > 0) {
-				this.setHealthy();
+        if (this.game.survivorCount > (this.game.survivorCount + this.game.infectedCount) / 2) {
+				      this.setHealthy();
+        }
 			}
       if (this.zombieDurability <= 0) {
         this.setLegless();
@@ -130,7 +132,7 @@ class Zombie extends Entity {
 		if (!this.infected) {
 			//attempt to find food, if food not found then take health away
 			let min = 0; let max = 10000;
-			if (Math.floor(Math.random() * (max - min)) + min >= 9990) {
+			if (Math.floor(Math.random() * (max - min)) + min >= 9980) {
 				this.health -= 50;
 			} else {
 				this.health++;
