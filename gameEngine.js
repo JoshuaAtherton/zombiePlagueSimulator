@@ -67,10 +67,21 @@ class GameEngine {
     this.ctx.canvas.addEventListener("click", function(e) {
       //console.log(getXandY(e));
       that.click = getXandY(e);
+      let z = new Zombie(that, that.surfaceWidth);
+      z.x = that.click.x;
+      z.y = that.click.y;
+      z.setResistanceFighter();
+      that.addEntity(z);
     }, false);
     this.ctx.canvas.addEventListener("contextmenu", function(e) {
       //console.log(getXandY(e));
       that.rightclick = getXandY(e);
+      console.log('right click');
+      let z = new Zombie(that, that.surfaceWidth);
+      z.x = that.rightclick.x;
+      z.y = that.rightclick.y;
+      z.setInfected();
+      that.addEntity(z);
       e.preventDefault();
     }, false);
     console.log('Input started');

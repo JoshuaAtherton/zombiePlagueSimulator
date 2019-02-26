@@ -6,6 +6,12 @@ canvas {
   width: auto;
 }
 
+.counters {
+  margin: auto;
+  text-align: center;
+  display: inline;
+}
+
 h1, h3, p, button {
   font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
   text-align: center;

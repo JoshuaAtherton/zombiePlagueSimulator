@@ -31,7 +31,7 @@ ASSET_MANAGER.downloadAll(function() {
     gameEngine.addEntity(singleZombie);
   }
 
-  //add the resistanceFighter
+  //add the resistanceFighters
   for (let i = 0; i < 1; i++) {
     singleZombie = new Zombie(gameEngine, canvas.width);
     singleZombie.setResistanceFighter();
