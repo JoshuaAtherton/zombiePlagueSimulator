@@ -71,10 +71,10 @@ class Zombie extends Entity {
     this.maxSpeed = 0;
     this.legless = true;
     this.color = 1;
-    // this.velocity = {
-    //   x: 0,
-    //   y: 0
-    // };
+    this.velocity = {
+      x: 0,
+      y: 0
+    };
     // console.log("Zombie's legs fell off");
   }
   //return boolean
@@ -199,61 +199,67 @@ class Zombie extends Entity {
           if (ent.resistanceFighter) { // resistance fighter hit & killed zombie
             this.removeFromWorld = true;
           } else {
-            this.zombieDurability += 5;
-            ent.setInfected();
+            if (!ent.legless) {
+              this.zombieDurability += 5;
+              ent.setInfected();
+            }
           }
-        } else if (ent.infected) {
+        } else if (ent.infected) { //zombie got hit
           if (this.resistanceFighter) {
             ent.removeFromWorld = true;
           } else {
-            this.setInfected();
+            if (!this.legless) {
+              this.setInfected();
+            }
           }
         }
       }
 
-      //handle collisions
-      if (ent != this && this.collide({
-          x: ent.x,
-          y: ent.y,
-          radius: this.visualRadius })
-      ) {
-        var dist = distance(this, ent);
-        // handle reistance fighter and infected zombie chasing behavior
-        if (this.infected || this.resistanceFighter && dist > this.radius + ent.radius ) {
-          var difX = (ent.x - this.x) / dist;
-          var difY = (ent.y - this.y) / dist;
-          if (this.infected) { //resistance figters dont chase survivors      /////
-            this.velocity.x += difX * this.acceleration / (dist * dist);
-            this.velocity.y += difY * this.acceleration / (dist * dist);
-            var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
-            if (speed > this.maxSpeed) {
-              var ratio = this.maxSpeed / speed;
-              this.velocity.x *= ratio;
-              this.velocity.y *= ratio;
-            }
-          // resistance fighters chase zombies
-          } else if (this.resistanceFighter && ent.infected) {
-            this.velocity.x += difX * this.acceleration / (dist * dist);
-            this.velocity.y += difY * this.acceleration / (dist * dist);
-            var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
-            if (speed > this.maxSpeed) {
-              var ratio = this.maxSpeed / speed;
-              this.velocity.x *= ratio;
-              this.velocity.y *= ratio;
+      if (!this.legless) {
+        //handle collisions
+        if (ent != this && this.collide({
+            x: ent.x,
+            y: ent.y,
+            radius: this.visualRadius })
+        ) {
+          var dist = distance(this, ent);
+          // handle reistance fighter and infected zombie chasing behavior
+          if (this.infected || this.resistanceFighter && dist > this.radius + ent.radius ) {
+            var difX = (ent.x - this.x) / dist;
+            var difY = (ent.y - this.y) / dist;
+            if (this.infected) { //resistance figters dont chase survivors      /////
+              this.velocity.x += difX * this.acceleration / (dist * dist);
+              this.velocity.y += difY * this.acceleration / (dist * dist);
+              var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
+              if (speed > this.maxSpeed) {
+                var ratio = this.maxSpeed / speed;
+                this.velocity.x *= ratio;
+                this.velocity.y *= ratio;
+              }
+            // resistance fighters chase zombies
+            } else if (this.resistanceFighter && ent.infected) {
+              this.velocity.x += difX * this.acceleration / (dist * dist);
+              this.velocity.y += difY * this.acceleration / (dist * dist);
+              var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
+              if (speed > this.maxSpeed) {
+                var ratio = this.maxSpeed / speed;
+                this.velocity.x *= ratio;
+                this.velocity.y *= ratio;
+              }
             }
           }
-        }
-        //resistance fighters don't run
-        if (ent.infected && !this.resistanceFighter && dist > this.radius + ent.radius) {
-          var difX = (ent.x - this.x) / dist;
-          var difY = (ent.y - this.y) / dist;
-          this.velocity.x -= difX * this.acceleration / (dist * dist);
-          this.velocity.y -= difY * this.acceleration / (dist * dist);
-          var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
-          if (speed > this.maxSpeed) {
-            var ratio = this.maxSpeed / speed;
-            this.velocity.x *= ratio;
-            this.velocity.y *= ratio;
+          //resistance fighters don't run
+          if (ent.infected && !this.resistanceFighter && dist > this.radius + ent.radius) {
+            var difX = (ent.x - this.x) / dist;
+            var difY = (ent.y - this.y) / dist;
+            this.velocity.x -= difX * this.acceleration / (dist * dist);
+            this.velocity.y -= difY * this.acceleration / (dist * dist);
+            var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
+            if (speed > this.maxSpeed) {
+              var ratio = this.maxSpeed / speed;
+              this.velocity.x *= ratio;
+              this.velocity.y *= ratio;
+            }
           }
         }
       }
