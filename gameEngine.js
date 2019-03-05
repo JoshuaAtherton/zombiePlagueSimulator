@@ -15,6 +15,7 @@ class GameEngine {
     this.showOutlines = false;
     this.click = null;
     this.mouse = null;
+    this.gameState = {};
 
     this.infectedCount = 0;
     this.survivorCount = 0;
@@ -29,6 +30,7 @@ class GameEngine {
   start() {
     console.log("starting game");
     this.updateCounters();
+    this.gameState = this.saveGameState(); // to reload initial game
 
     var that = this;
     (function gameLoop() {
@@ -76,7 +78,7 @@ class GameEngine {
     this.ctx.canvas.addEventListener("contextmenu", function(e) {
       //console.log(getXandY(e));
       that.rightclick = getXandY(e);
-      console.log('right click');
+      // console.log('right click');
       let z = new Zombie(that, that.surfaceWidth);
       z.x = that.rightclick.x;
       z.y = that.rightclick.y;
@@ -124,8 +126,47 @@ class GameEngine {
     this.rightclick = null;
     this.wheel = null;
   }
-  drawFinishedScreen() {
 
+  saveGameState() {
+    this.gameState.infectedCount = this.infectedCount;
+    this.gameState.survivorCount = this.survivorCount;
+    this.gameState.entities = [];
+
+    for (var i = 0; i < this.entities.length; i++) {
+      if (!this.entities[i].removeFromWorld) {
+        let save = this.entities[i].getSaveState();
+        this.gameState.entities.push(save);
+      }
+    }
+
+    return this.gameState;
+  }
+  /*
+  clear all entities from array
+  create all entites and add them to the entities array while setting them to their saved state
+  data {
+    infectedCount: number
+    survivorCount: number
+    entites: [ array of get save state function]
+  }
+  */
+  loadGameState(data) {
+    console.log('from load game eng');
+    console.log(data.infectedCount);
+    console.log('end from load game eng');
+    console.log('end from load game eng');
+    this.infectedCount = data.infectedCount;
+    this.survivorCount = data.survivorCount;
+    this.entities = [];
+    for (let i = 0; i < this.infectedCount + this.survivorCount; i++) {
+      let loadedEntity = new Zombie(this, this.surfaceWidth);
+      loadedEntity.setFromSavedSate(data.entities[i]);
+      this.entities.push(loadedEntity);
+    }
+  }
+
+  drawFinishedScreen() {
+    //this is done in update method of zombie class
   }
 }
 
@@ -189,7 +230,7 @@ class AssetManager {
     this.downloadQueue = [];
   }
   queueDownload(path) {
-    console.log("Queueing " + path);
+    // console.log("Queueing " + path);
     this.downloadQueue.push(path);
   }
   isDone() {
@@ -200,9 +241,9 @@ class AssetManager {
       var img = new Image();
       var that = this;
       var path = this.downloadQueue[i];
-      console.log(path);
+      // console.log(path);
       img.addEventListener("load", function() {
-        console.log("Loaded " + this.src);
+        // console.log("Loaded " + this.src);
         that.successCount++;
         if (that.isDone())
           callback();

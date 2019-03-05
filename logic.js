@@ -45,6 +45,39 @@ class Zombie extends Entity {
       this.velocity.y *= ratio;
     }
   }
+  getSaveState() {
+    let myState = {};
+    myState.x = this.x;
+    myState.y = this.y;
+    myState.removeFromWorld = this.removeFromWorld;
+    myState.zombieDurability = this.zombieDurability;
+    myState.resistanceFighter = this.resistanceFighter;
+    myState.infected = this.infected;
+    myState.legless = this.legless;
+    myState.color = this.color;
+    myState.visualRadius = this.visualRadius;
+    myState.speed = this.speed;
+    myState.maxSpeed = this.maxSpeed;
+    myState.health = this.health;
+    myState.velocity = this.velocity;
+
+    return myState;
+  }
+  setFromSavedSate(oldState) {
+    this.x = oldState.x;
+    this.y = oldState.y;
+    this.removeFromWorld = oldState.removeFromWorld;
+    this.zombieDurability = oldState.zombieDurability;
+    this.resistanceFighter = oldState.resistanceFighter;
+    this.infected = oldState.infected;
+    this.legless = oldState.legless;
+    this.color = oldState.color;
+    this.visualRadius = oldState.visualRadius;
+    this.speed = oldState.speed;
+    this.maxSpeed = oldState.maxSpeed;
+    this.health = oldState.health;
+    this.velocity = oldState.velocity;
+  }
   setInfected() {
     this.infected = true;
     this.color = 0;

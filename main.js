@@ -44,6 +44,29 @@ ASSET_MANAGER.downloadAll(function() {
     gameEngine.addEntity(singleZombie);
   }
 
+  var socket = io.connect("http://24.16.255.56:8888");
+  var saveButton = document.getElementById("save");
+  var loadButton = document.getElementById("load");
+
+  socket.on("load", function (data) {
+      console.log(data);
+      gameEngine.loadGameState(data.data);
+  });
+
+  // var gameState = { test: 1, cat: "orange", worked: true};
+
+  saveButton.onclick = function () {
+    console.log("save");
+    let currentState = gameEngine.saveGameState();
+    socket.emit("save", { studentname: "Joshua Atherton", statename: "zombieSlayer", data: currentState });
+  };
+
+  loadButton.onclick = function () {
+    console.log("load");
+    socket.emit("load", { studentname: "Joshua Atherton", statename: "zombieSlayer" });
+  };
+
+
   // document.getElementById("restartSimulation")
   //   .addEventListener('click', function() {
   //     gameEngine = startNewSimulation(ctx);
